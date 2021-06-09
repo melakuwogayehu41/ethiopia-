@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:s3="http://www.mulesoft.org/schema/mule/s3" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/current/mule-s3.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="208609a9-3875-4ffa-8c0b-4c1e6685e15c" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="example-demoFlow" doc:id="af62adf4-1a1d-4025-a8df-de59da1b4cff" >
+		<http:listener doc:name="Listener" doc:id="33c17c04-b779-409c-9675-8a3530004b60" config-ref="HTTP_Listener_config" path="/hello"/>
+		<set-payload value="#[[1,2,3,4]]" doc:name="[1,2,3,4]" doc:id="87aa4c0d-d926-464c-bbc5-41132b124a21" />
+		<foreach doc:name="For Each" doc:id="a9a9dadc-708f-4091-8f48-dfbd3ebf4d78" >
+			<set-payload value='#["order"++ payload]' doc:name='"order"++payload' doc:id="3e9f907d-6e6d-42ee-b0b1-31778561de20" />
+		</foreach>
+		<ee:transform doc:name="Transform Message" doc:id="0e8b29e7-d25d-4592-9169-f422ca62217e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<s3:complete-multipart-upload doc:name="Complete multipart upload" doc:id="2cad8e26-68f9-4131-8d9b-23e53ef32d0a" />
+		<logger level="INFO" doc:name="Logger" doc:id="7a383628-c8d9-42f2-8a1b-098c77e76c1e" message="payload"/>
+	</flow>
+</mule>
